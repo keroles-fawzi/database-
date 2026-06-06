@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Database Lab — ملاحظات الامتحان</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e14;
+  --bg2: #0f1520;
+  --bg3: #141c2e;
+  --surface: #1a2540;
+  --surface2: #1f2d4a;
+  --border: #2a3a5c;
+  --border2: #3a5080;
+  --text: #d4e2f7;
+  --text2: #8ca8cc;
+  --text3: #4a6a99;
+  --accent: #4fc3f7;
+  --accent2: #00e5ff;
+  --green: #69f0ae;
+  --green2: #1de9b6;
+  --yellow: #ffd740;
+  --orange: #ff9e40;
+  --red: #ff5252;
+  --purple: #ce93d8;
+  --pink: #f48fb1;
+  --kw: #7ecaf5;
+  --kw2: #69f0ae;
+  --str: #ffd740;
+  --num: #ff9e40;
+  --cmt: #4a6a99;
+  --op: #f48fb1;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRID BG */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(79,195,247,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(79,195,247,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* SCANLINE */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* HEADER */
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,14,20,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; gap: 2rem;
+  height: 58px;
+}
+
+.logo {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px; font-weight: 600;
+  color: var(--accent2);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.logo span { color: var(--text3); }
+
+nav { display: flex; gap: 4px; flex-wrap: wrap; margin-right: auto; }
+
+.nav-btn {
+  padding: 5px 14px; font-size: 13px; font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+  background: transparent; border: 1px solid transparent;
+  color: var(--text3); border-radius: 6px; cursor: pointer;
+  transition: all 0.2s; white-space: nowrap;
+}
+.nav-btn:hover { color: var(--text); border-color: var(--border); }
+.nav-btn.active { color: var(--accent); border-color: var(--accent); background: rgba(79,195,247,0.08); }
+
+/* MAIN */
+main { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+/* HERO */
+.hero {
+  text-align: center; padding: 3rem 0 2.5rem;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hero-badge {
+  display: inline-block; margin-bottom: 1rem;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  color: var(--accent); background: rgba(79,195,247,0.1);
+  border: 1px solid rgba(79,195,247,0.3); border-radius: 100px;
+  padding: 4px 14px; letter-spacing: 0.1em;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 900;
+  line-height: 1.2; margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--green2) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero p { font-size: 15px; color: var(--text2); max-width: 520px; margin: 0 auto; line-height: 1.8; }
+
+/* SECTIONS */
+.page { display: none; animation: fadeUp 0.4s ease both; }
+.page.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* TOPIC GRID */
+.topic-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+
+/* CARD */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.card:hover { border-color: var(--border2); transform: translateY(-2px); }
+
+.card-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; cursor: pointer;
+  background: var(--bg3);
+  border-bottom: 1px solid transparent;
+  user-select: none;
+}
+.card-header:hover { background: var(--surface); }
+.card.open .card-header { border-color: var(--border); }
+
+.card-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; flex-shrink: 0;
+}
+.ci-blue { background: rgba(79,195,247,0.15); color: var(--accent); }
+.ci-green { background: rgba(105,240,174,0.15); color: var(--green); }
+.ci-yellow { background: rgba(255,215,64,0.15); color: var(--yellow); }
+.ci-purple { background: rgba(206,147,216,0.15); color: var(--purple); }
+.ci-pink { background: rgba(244,143,177,0.15); color: var(--pink); }
+.ci-orange { background: rgba(255,158,64,0.15); color: var(--orange); }
+
+.card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.card-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+.card-chevron { margin-right: auto; color: var(--text3); font-size: 12px; transition: transform 0.3s; }
+.card.open .card-chevron { transform: rotate(180deg); }
+
+.card-body { display: none; padding: 16px; }
+.card.open .card-body { display: block; }
+
+/* CODE BLOCK */
+.code {
+  background: #060a10;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px; line-height: 1.85;
+  overflow-x: auto; white-space: pre;
+  margin: 10px 0;
+  position: relative;
+}
+
+.code-label {
+  position: absolute; top: 8px; left: 10px;
+  font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+  color: var(--text3); letter-spacing: 0.08em;
+}
+
+.kw { color: var(--kw); font-weight: 500; }
+.kw2 { color: var(--kw2); }
+.str { color: var(--str); }
+.num { color: var(--num); }
+.cmt { color: var(--cmt); font-style: italic; }
+.op { color: var(--op); }
+.sym { color: var(--purple); font-size: 1.1em; }
+
+/* TIPS */
+.tip {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: rgba(105,240,174,0.07);
+  border: 1px solid rgba(105,240,174,0.2);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; color: #a8f0cc; margin: 8px 0; line-height: 1.6;
+}
+.tip::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+
+.warn {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: rgba(255,82,82,0.07);
+  border: 1px solid rgba(255,82,82,0.2);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; color: #ffaaaa; margin: 8px 0; line-height: 1.6;
+}
+.warn::before { content: '⚠'; color: var(--red); flex-shrink: 0; }
+
+.info {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: rgba(79,195,247,0.07);
+  border: 1px solid rgba(79,195,247,0.2);
+  border-radius: 8px; padding: 10px 12px;
+  font-size: 13px; color: #a8d8f0; margin: 8px 0; line-height: 1.6;
+}
+.info::before { content: 'ℹ'; color: var(--accent); flex-shrink: 0; }
+
+/* LABEL */
+.lbl {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text3); margin: 14px 0 6px;
+}
+
+/* TABLE */
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+.tbl th {
+  background: var(--bg3); padding: 9px 12px;
+  border: 1px solid var(--border); font-weight: 600;
+  color: var(--text2); text-align: right;
+}
+.tbl td { padding: 9px 12px; border: 1px solid var(--border); color: var(--text); }
+.tbl tr:hover td { background: rgba(79,195,247,0.03); }
+.sym-cell { font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: var(--purple); font-weight: 700; text-align: center !important; }
+
+/* SECTION TITLE */
+.sec-title {
+  font-size: 1.5rem; font-weight: 900; color: var(--text);
+  margin-bottom: 0.25rem;
+}
+.sec-sub { font-size: 14px; color: var(--text3); margin-bottom: 1.5rem; }
+
+/* FULL CARD (non-grid) */
+.full-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; overflow: hidden; margin-bottom: 1.2rem;
+  transition: border-color 0.2s;
+}
+.full-card:hover { border-color: var(--border2); }
+.full-card .card-header { width: 100%; }
+.full-card .card-body { padding: 18px; }
+
+/* QUIZ */
+.quiz-header {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;
+  padding: 16px 20px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 12px;
+}
+
+.score-big {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 2rem; font-weight: 600; color: var(--accent2);
+}
+
+.score-lbl { font-size: 13px; color: var(--text3); }
+
+.progress-bar {
+  height: 4px; background: var(--border); border-radius: 2px;
+  flex: 1; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, var(--accent), var(--green2));
+  border-radius: 2px; transition: width 0.4s ease;
+}
+
+.reset-btn {
+  padding: 8px 18px; font-size: 13px; font-weight: 600;
+  font-family: 'Cairo', sans-serif;
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text3); border-radius: 8px; cursor: pointer;
+  transition: all 0.2s; margin-right: auto;
+}
+.reset-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.q-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 20px; margin-bottom: 14px;
+  transition: border-color 0.3s;
+}
+.q-num {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+  color: var(--accent); letter-spacing: 0.1em; margin-bottom: 8px;
+}
+.q-text { font-size: 15px; font-weight: 700; color: var(--text); line-height: 1.6; margin-bottom: 14px; }
+
+.q-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+@media (max-width: 600px) { .q-opts { grid-template-columns: 1fr; } }
+
+.q-opt {
+  padding: 10px 14px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg3);
+  font-size: 13px; font-family: 'Cairo', sans-serif;
+  font-weight: 600; color: var(--text2);
+  cursor: pointer; text-align: right;
+  transition: all 0.15s; line-height: 1.5;
+}
+.q-opt:hover:not(.locked) {
+  border-color: var(--accent); color: var(--accent);
+  background: rgba(79,195,247,0.06);
+}
+.q-opt.correct { border-color: var(--green) !important; color: var(--green) !important; background: rgba(105,240,174,0.08) !important; }
+.q-opt.wrong { border-color: var(--red) !important; color: var(--red) !important; background: rgba(255,82,82,0.08) !important; }
+
+.q-explain {
+  margin-top: 12px; padding: 10px 14px; border-radius: 8px;
+  font-size: 13px; line-height: 1.7; display: none;
+}
+.q-explain.show { display: block; }
+.q-explain.ok { background: rgba(105,240,174,0.07); border: 1px solid rgba(105,240,174,0.2); color: #a8f0cc; }
+.q-explain.fail { background: rgba(255,82,82,0.07); border: 1px solid rgba(255,82,82,0.2); color: #ffaaaa; }
+
+/* FILL */
+.fill-section { margin-top: 2rem; }
+.fill-sec-title {
+  font-size: 16px; font-weight: 700; color: var(--yellow); margin-bottom: 1rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.fill-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 18px; margin-bottom: 12px;
+}
+.fill-q { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 10px; line-height: 1.6; }
+.fill-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.fill-in {
+  font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  padding: 8px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg3);
+  color: var(--text); outline: none; width: 260px; max-width: 100%;
+  transition: border-color 0.2s;
+}
+.fill-in:focus { border-color: var(--accent); }
+.fill-in.ok { border-color: var(--green); }
+.fill-in.fail { border-color: var(--red); }
+.check-btn {
+  padding: 8px 18px; font-size: 13px; font-weight: 700;
+  font-family: 'Cairo', sans-serif;
+  background: rgba(79,195,247,0.1); border: 1px solid var(--accent);
+  color: var(--accent); border-radius: 8px; cursor: pointer;
+  transition: all 0.15s;
+}
+.check-btn:hover { background: rgba(79,195,247,0.18); }
+.fill-res { font-size: 13px; margin-top: 8px; padding: 8px 12px; border-radius: 8px; display: none; line-height: 1.6; }
+.fill-res.show { display: block; }
+.fill-res.ok { background: rgba(105,240,174,0.07); color: #a8f0cc; border: 1px solid rgba(105,240,174,0.2); }
+.fill-res.fail { background: rgba(255,82,82,0.07); color: #ffaaaa; border: 1px solid rgba(255,82,82,0.2); }
+
+/* CHEATSHEET */
+.cheat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.cheat-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+  transition: border-color 0.2s;
+}
+.cheat-card:hover { border-color: var(--border2); }
+.cheat-head { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+
+/* BADGE */
+.badge {
+  font-size: 10px; font-family: 'IBM Plex Mono', monospace;
+  padding: 2px 8px; border-radius: 100px; font-weight: 500;
+}
+.badge-blue { background: rgba(79,195,247,0.15); color: var(--accent); }
+.badge-green { background: rgba(105,240,174,0.15); color: var(--green); }
+.badge-yellow { background: rgba(255,215,64,0.15); color: var(--yellow); }
+.badge-red { background: rgba(255,82,82,0.15); color: var(--red); }
+.badge-purple { background: rgba(206,147,216,0.15); color: var(--purple); }
+
+/* RA SYMBOLS */
+.ra-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.ra-row:last-child { border-bottom: none; }
+.ra-sym { width: 44px; height: 44px; border-radius: 10px; background: rgba(206,147,216,0.12); display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--purple); flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; font-weight: 700; }
+.ra-info { flex: 1; }
+.ra-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.ra-sql { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text3); }
+.ra-example { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--purple); margin-top: 4px; }
+
+/* INLINE CODE */
+ic { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: var(--bg3); border: 1px solid var(--border); padding: 1px 6px; border-radius: 4px; color: var(--accent); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* COPY BTN */
+.copy-btn {
+  position: absolute; top: 8px; right: 10px;
+  font-size: 11px; font-family: 'IBM Plex Mono', monospace;
+  background: rgba(79,195,247,0.08); border: 1px solid rgba(79,195,247,0.2);
+  color: var(--accent); padding: 3px 10px; border-radius: 4px;
+  cursor: pointer; transition: all 0.15s; z-index: 10;
+}
+.copy-btn:hover { background: rgba(79,195,247,0.18); }
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 1; text-align: center;
+  padding: 2rem; font-size: 12px; color: var(--text3);
+  border-top: 1px solid var(--border); margin-top: 3rem;
+  font-family: 'IBM Plex Mono', monospace;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">DB<span>_</span>LAB <span>// امتحان</span></div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('home')">🏠 الرئيسية</button>
+    <button class="nav-btn" onclick="showPage('lab3')">Lab 3 — ALTER</button>
+    <button class="nav-btn" onclick="showPage('lab4')">Lab 4 — DML</button>
+    <button class="nav-btn" onclick="showPage('constraints')">Constraints</button>
+    <button class="nav-btn" onclick="showPage('ra')">Relational Algebra</button>
+    <button class="nav-btn" onclick="showPage('cheat')">📋 Cheatsheet</button>
+    <button class="nav-btn" onclick="showPage('quiz')">🎯 اختبار</button>
+  </nav>
+</header>
+
+<main>
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-badge">DATABASE LABS — LAB 3 &amp; LAB 4</div>
+    <h1>ملاحظات <em>الامتحان</em><br>قاعدة البيانات</h1>
+    <p>كل الكود والأوامر والأمثلة التي تحتاجها في مكان واحد — مع اختبار تفاعلي</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-top:1rem;">
+    <div onclick="showPage('lab3')" style="cursor:pointer" class="cheat-card" onmouseover="this.style.borderColor='#4fc3f7'" onmouseout="this.style.borderColor='#2a3a5c'">
+      <div style="font-size:2rem;margin-bottom:8px">🔧</div>
+      <div style="font-size:15px;font-weight:700;color:var(--accent);margin-bottom:6px">Lab 3 — ALTER TABLE</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">إضافة وتعديل وحذف أعمدة · PRIMARY KEY · FOREIGN KEY</div>
+    </div>
+    <div onclick="showPage('lab4')" style="cursor:pointer" class="cheat-card" onmouseover="this.style.borderColor='#69f0ae'" onmouseout="this.style.borderColor='#2a3a5c'">
+      <div style="font-size:2rem;margin-bottom:8px">📊</div>
+      <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:6px">Lab 4 — DML</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">INSERT · SELECT · UPDATE · DELETE · JOIN</div>
+    </div>
+    <div onclick="showPage('constraints')" style="cursor:pointer" class="cheat-card" onmouseover="this.style.borderColor='#ffd740'" onmouseout="this.style.borderColor='#2a3a5c'">
+      <div style="font-size:2rem;margin-bottom:8px">🔒</div>
+      <div style="font-size:15px;font-weight:700;color:var(--yellow);margin-bottom:6px">Constraints</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">NOT NULL · UNIQUE · CHECK · PK · FK</div>
+    </div>
+    <div onclick="showPage('ra')" style="cursor:pointer" class="cheat-card" onmouseover="this.style.borderColor='#ce93d8'" onmouseout="this.style.borderColor='#2a3a5c'">
+      <div style="font-size:2rem;margin-bottom:8px">📐</div>
+      <div style="font-size:15px;font-weight:700;color:var(--purple);margin-bottom:6px">Relational Algebra</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">σ Selection · π Projection · ∪ Union · ⋈ Join</div>
+    </div>
+    <div onclick="showPage('cheat')" style="cursor:pointer" class="cheat-card" onmouseover="this.style.borderColor='#f48fb1'" onmouseout="this.style.borderColor='#2a3a5c'">
+      <div style="font-size:2rem;margin-bottom:8px">📋</div>
+      <div style="font-size:15px;font-weight:700;color:var(--pink);margin-bottom:6px">Cheatsheet سريع</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">مرجع سريع لجميع الأوامر</div>
+    </div>
+    <div onclick="showPage('quiz')" style="cursor:pointer" class="cheat-card" onmouseover="this.style.borderColor='#ff9e40'" onmouseout="this.style.borderColor='#2a3a5c'">
+      <div style="font-size:2rem;margin-bottom:8px">🎯</div>
+      <div style="font-size:15px;font-weight:700;color:var(--orange);margin-bottom:6px">اختبار تفاعلي</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6">10 أسئلة اختيار + 4 أسئلة أكمل الكود</div>
+    </div>
+  </div>
+
+  <div style="margin-top:2rem;padding:20px;background:var(--bg2);border:1px solid var(--border);border-radius:12px;">
+    <div style="font-size:13px;font-weight:700;color:var(--yellow);margin-bottom:12px">⚡ أهم النقاط للامتحان</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px">
+      <div class="tip">PRIMARY KEY = NOT NULL + UNIQUE تلقائياً</div>
+      <div class="tip">يجب إنشاء جدول الأب (department) قبل الابن (student)</div>
+      <div class="tip">UPDATE و DELETE بدون WHERE تؤثر على كل الصفوف</div>
+      <div class="tip">σ (sigma) = Selection = WHERE في SQL</div>
+      <div class="tip">π (pi) = Projection = SELECT columns في SQL</div>
+      <div class="warn">TRUNCATE لا يمكن التراجع عنه (No Rollback)</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAB 3 -->
+<div class="page" id="page-lab3">
+  <div class="sec-title">🔧 Lab 3 — ALTER TABLE &amp; Keys</div>
+  <div class="sec-sub">تعديل هيكل الجداول وتعريف المفاتيح</div>
+
+  <!-- ADD COLUMN -->
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-blue">➕</div>
+      <div><div class="card-title">ADD COLUMN — إضافة عمود جديد</div><div class="card-sub">ALTER TABLE ... ADD</div></div>
+      <span class="badge badge-blue" style="margin-right:auto">ALTER</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">الصيغة العامة</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">ALTER TABLE</span> table_name <span class="kw">ADD</span> column_name datatype;</div>
+      <div class="lbl">مثال — إضافة عمود email</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">ALTER TABLE</span> student <span class="kw">ADD</span> email <span class="kw2">VARCHAR2</span>(<span class="num">100</span>);</div>
+      <div class="tip">يضيف العمود للجدول دون حذف أي بيانات موجودة</div>
+      <div class="info">القيمة الافتراضية للعمود الجديد ستكون NULL لجميع الصفوف الموجودة</div>
+    </div>
+  </div>
+
+  <!-- MODIFY -->
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-yellow">✏️</div>
+      <div><div class="card-title">MODIFY COLUMN — تعديل عمود موجود</div><div class="card-sub">ALTER TABLE ... MODIFY</div></div>
+      <span class="badge badge-yellow" style="margin-right:auto">ALTER</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">تغيير حجم العمود</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">ALTER TABLE</span> student <span class="kw">MODIFY</span> student_name <span class="kw2">VARCHAR2</span>(<span class="num">100</span>);</div>
+      <div class="lbl">إضافة قيد NOT NULL</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">ALTER TABLE</span> student <span class="kw">MODIFY</span> student_name <span class="kw2">VARCHAR2</span>(<span class="num">50</span>) <span class="kw">NOT NULL</span>;</div>
+      <div class="warn">تصغير الحجم قد يفشل إذا كانت البيانات الموجودة أكبر من الحجم الجديد</div>
+    </div>
+  </div>
+
+  <!-- DROP -->
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-pink">🗑️</div>
+      <div><div class="card-title">DROP COLUMN — حذف عمود</div><div class="card-sub">ALTER TABLE ... DROP COLUMN</div></div>
+      <span class="badge badge-red" style="margin-right:auto">خطر</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">ALTER TABLE</span> student <span class="kw">DROP COLUMN</span> email;</div>
+      <div class="warn">العملية لا رجعة منها — البيانات تُحذف نهائياً مع العمود</div>
+      <div class="warn">لا يمكن حذف عمود إذا كان جزء من PRIMARY KEY أو FOREIGN KEY مباشرة</div>
+    </div>
+  </div>
+
+  <!-- RENAME -->
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-purple">🔄</div>
+      <div><div class="card-title">RENAME COLUMN — إعادة تسمية</div><div class="card-sub">ALTER TABLE ... RENAME COLUMN</div></div>
+      <span class="badge badge-purple" style="margin-right:auto">ALTER</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">ALTER TABLE</span> student
+<span class="kw">RENAME COLUMN</span> student_name <span class="kw">TO</span> full_name;</div>
+      <div class="tip">يغير الاسم فقط دون المساس بالبيانات أو الـ datatype</div>
+    </div>
+  </div>
+
+  <!-- PRIMARY KEY -->
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-green">🔑</div>
+      <div><div class="card-title">PRIMARY KEY — المفتاح الأساسي</div><div class="card-sub">CONSTRAINT ... PRIMARY KEY</div></div>
+      <span class="badge badge-green" style="margin-right:auto">KEY</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">تعريف PRIMARY KEY عند إنشاء الجدول</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">CREATE TABLE</span> student (
+  student_id   <span class="kw2">NUMBER</span>,
+  student_name <span class="kw2">VARCHAR2</span>(<span class="num">50</span>),
+  <span class="kw">CONSTRAINT</span> student_pk <span class="kw">PRIMARY KEY</span>(student_id)
+);</div>
+      <div class="tip">PRIMARY KEY = NOT NULL + UNIQUE — لا يمكن أن يكون NULL أو مكرر</div>
+      <div class="info">اسم الـ constraint (student_pk) اختياري لكن من الأفضل تسميته</div>
+      <div class="lbl">إضافة PRIMARY KEY لجدول موجود</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">ALTER TABLE</span> student
+<span class="kw">ADD CONSTRAINT</span> student_pk <span class="kw">PRIMARY KEY</span>(student_id);</div>
+    </div>
+  </div>
+
+  <!-- FOREIGN KEY -->
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-orange">🔗</div>
+      <div><div class="card-title">FOREIGN KEY — المفتاح الأجنبي</div><div class="card-sub">CONSTRAINT ... FOREIGN KEY ... REFERENCES</div></div>
+      <span class="badge badge-yellow" style="margin-right:auto">KEY</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">الخطوة 1 — إنشاء جدول الأب (department) أولاً</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">CREATE TABLE</span> department (
+  dept_id   <span class="kw2">NUMBER</span>,
+  dept_name <span class="kw2">VARCHAR2</span>(<span class="num">30</span>),
+  <span class="kw">CONSTRAINT</span> dept_pk <span class="kw">PRIMARY KEY</span>(dept_id)
+);</div>
+      <div class="lbl">الخطوة 2 — إنشاء جدول الابن (student) مع FOREIGN KEY</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">CREATE TABLE</span> student (
+  student_id   <span class="kw2">NUMBER</span>,
+  student_name <span class="kw2">VARCHAR2</span>(<span class="num">50</span>),
+  dept_id      <span class="kw2">NUMBER</span>,
+  <span class="kw">CONSTRAINT</span> student_pk <span class="kw">PRIMARY KEY</span>(student_id),
+  <span class="kw">CONSTRAINT</span> dept_fk <span class="kw">FOREIGN KEY</span>(dept_id)
+    <span class="kw">REFERENCES</span> department(dept_id)
+);</div>
+      <div class="warn">يجب إنشاء جدول department أولاً — وإلا سيفشل الأمر</div>
+      <div class="warn">لا يمكن إدخال dept_id في student إذا لم تكن قيمته موجودة في department</div>
+      <div class="tip">عمود الـ FK في الابن يجب أن يكون نفس الـ datatype لعمود PK في الأب</div>
+    </div>
+  </div>
+</div>
+
+<!-- LAB 4 -->
+<div class="page" id="page-lab4">
+  <div class="sec-title">📊 Lab 4 — DML Statements</div>
+  <div class="sec-sub">أوامر التعامل مع البيانات</div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-green">➕</div>
+      <div><div class="card-title">INSERT — إدخال بيانات</div><div class="card-sub">INSERT INTO ... VALUES</div></div>
+      <span class="badge badge-green" style="margin-right:auto">DML</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">إدخال كامل (كل الأعمدة بالترتيب)</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">INSERT INTO</span> department <span class="kw">VALUES</span>(<span class="num">1</span>, <span class="str">'IT'</span>);
+<span class="kw">INSERT INTO</span> department <span class="kw">VALUES</span>(<span class="num">2</span>, <span class="str">'CS'</span>);
+
+<span class="kw">INSERT INTO</span> student <span class="kw">VALUES</span>(<span class="num">101</span>, <span class="str">'Ahmad'</span>, <span class="num">1</span>);
+<span class="kw">INSERT INTO</span> student <span class="kw">VALUES</span>(<span class="num">102</span>, <span class="str">'Sara'</span>, <span class="num">2</span>);</div>
+      <div class="lbl">إدخال أعمدة محددة فقط</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">INSERT INTO</span> student(student_id, student_name)
+<span class="kw">VALUES</span>(<span class="num">103</span>, <span class="str">'Omar'</span>);
+<span class="cmt">-- dept_id ستكون NULL</span></div>
+      <div class="tip">يجب إدخال بيانات جدول الأب (department) أولاً قبل الابن (student)</div>
+      <div class="info">الترتيب في VALUES يجب أن يطابق ترتيب الأعمدة في الجدول أو في قائمة الأعمدة</div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-blue">🔍</div>
+      <div><div class="card-title">SELECT — استعلام البيانات</div><div class="card-sub">SELECT ... FROM ... WHERE</div></div>
+      <span class="badge badge-blue" style="margin-right:auto">DML</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">عرض كل البيانات</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> * <span class="kw">FROM</span> student;</div>
+      <div class="lbl">عرض أعمدة محددة</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> student_name, dept_id
+<span class="kw">FROM</span> student;</div>
+      <div class="lbl">عرض مع شرط WHERE</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> * <span class="kw">FROM</span> student
+<span class="kw">WHERE</span> student_id = <span class="num">101</span>;</div>
+      <div class="lbl">JOIN بين جدولين — المثال الكامل</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> student_name, dept_name
+<span class="kw">FROM</span> student
+<span class="kw">JOIN</span> department
+<span class="kw">ON</span> student.dept_id = department.dept_id;</div>
+      <div class="tip">الـ JOIN يربط الجدولين بناءً على العمود المشترك (dept_id)</div>
+      <div class="lbl">ORDER BY ترتيب النتائج</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> * <span class="kw">FROM</span> student
+<span class="kw">ORDER BY</span> student_name <span class="kw">ASC</span>; <span class="cmt">-- أو DESC</span></div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-yellow">✏️</div>
+      <div><div class="card-title">UPDATE — تعديل بيانات موجودة</div><div class="card-sub">UPDATE ... SET ... WHERE</div></div>
+      <span class="badge badge-yellow" style="margin-right:auto">DML</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">تعديل صف واحد</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">UPDATE</span> student
+<span class="kw">SET</span> student_name = <span class="str">'Mohammad'</span>
+<span class="kw">WHERE</span> student_id = <span class="num">101</span>;</div>
+      <div class="lbl">تعديل أكثر من عمود</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">UPDATE</span> student
+<span class="kw">SET</span> student_name = <span class="str">'Mohammad'</span>,
+    dept_id = <span class="num">2</span>
+<span class="kw">WHERE</span> student_id = <span class="num">101</span>;</div>
+      <div class="warn">⚠️ بدون WHERE سيتم تعديل جميع الصفوف في الجدول!</div>
+      <div class="code"><span class="cmt">-- هذا يعدل كل الطلاب:</span>
+<span class="kw">UPDATE</span> student <span class="kw">SET</span> dept_id = <span class="num">1</span>; <span class="cmt">-- خطر!</span></div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-pink">🗑️</div>
+      <div><div class="card-title">DELETE — حذف بيانات</div><div class="card-sub">DELETE FROM ... WHERE</div></div>
+      <span class="badge badge-red" style="margin-right:auto">خطر</span>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">حذف صف معين</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">DELETE FROM</span> student
+<span class="kw">WHERE</span> student_id = <span class="num">102</span>;</div>
+      <div class="warn">بدون WHERE يحذف كل البيانات من الجدول!</div>
+      <div class="lbl">مقارنة DELETE vs TRUNCATE</div>
+      <div class="code"><span class="cmt">-- DELETE: مع WHERE، يمكن Rollback</span>
+<span class="kw">DELETE FROM</span> student <span class="kw">WHERE</span> student_id = <span class="num">102</span>;
+
+<span class="cmt">-- TRUNCATE: يحذف الكل، لا يمكن Rollback، أسرع</span>
+<span class="kw">TRUNCATE TABLE</span> student;</div>
+      <table class="tbl" style="margin-top:12px">
+        <tr><th>الخاصية</th><th>DELETE</th><th>TRUNCATE</th></tr>
+        <tr><td>WHERE</td><td style="color:var(--green)">✓ يدعم</td><td style="color:var(--red)">✗ لا يدعم</td></tr>
+        <tr><td>Rollback</td><td style="color:var(--green)">✓ ممكن</td><td style="color:var(--red)">✗ مستحيل</td></tr>
+        <tr><td>السرعة</td><td>أبطأ</td><td style="color:var(--green)">أسرع</td></tr>
+        <tr><td>الـ Triggers</td><td style="color:var(--green)">✓ يفعّلها</td><td style="color:var(--red)">✗ لا يفعّلها</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CONSTRAINTS -->
+<div class="page" id="page-constraints">
+  <div class="sec-title">🔒 Constraints — قيود البيانات</div>
+  <div class="sec-sub">ضمان صحة وسلامة البيانات</div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-blue">📋</div>
+      <div><div class="card-title">مقارنة جميع أنواع القيود</div></div>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <table class="tbl">
+        <tr><th>القيد</th><th>يمنع</th><th>ملاحظة مهمة</th></tr>
+        <tr><td><span style="color:var(--accent)">NOT NULL</span></td><td>قيمة فارغة (NULL)</td><td>الحقل إلزامي</td></tr>
+        <tr><td><span style="color:var(--green)">UNIQUE</span></td><td>تكرار القيمة</td><td>يسمح بـ NULL واحد فقط</td></tr>
+        <tr><td><span style="color:var(--yellow)">CHECK</span></td><td>قيمة لا تحقق الشرط</td><td>مثل salary > 0</td></tr>
+        <tr><td><span style="color:var(--orange)">PRIMARY KEY</span></td><td>NULL والتكرار معاً</td><td>= NOT NULL + UNIQUE</td></tr>
+        <tr><td><span style="color:var(--purple)">FOREIGN KEY</span></td><td>قيمة غير موجودة في الأب</td><td>يربط جدولين</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-blue">🔵</div>
+      <div><div class="card-title">NOT NULL</div><div class="card-sub">منع القيم الفارغة</div></div>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">CREATE TABLE</span> student (
+  student_id   <span class="kw2">NUMBER</span>,
+  student_name <span class="kw2">VARCHAR2</span>(<span class="num">50</span>) <span class="kw">NOT NULL</span>, <span class="cmt">-- إلزامي</span>
+  email        <span class="kw2">VARCHAR2</span>(<span class="num">100</span>)           <span class="cmt">-- اختياري (NULL مسموح)</span>
+);</div>
+      <div class="tip">يمنع إدخال صف بدون قيمة في هذا العمود</div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-green">💚</div>
+      <div><div class="card-title">UNIQUE</div><div class="card-sub">منع التكرار</div></div>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button>email <span class="kw2">VARCHAR2</span>(<span class="num">50</span>) <span class="kw">UNIQUE</span>
+
+<span class="cmt">-- أو بشكل constraint مسمى:</span>
+<span class="kw">CONSTRAINT</span> email_uq <span class="kw">UNIQUE</span>(email)</div>
+      <div class="tip">يسمح بـ NULL ولكن مرة واحدة فقط — لأن NULL != NULL في SQL</div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-yellow">✅</div>
+      <div><div class="card-title">CHECK</div><div class="card-sub">شرط مخصص على القيم</div></div>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="cmt">-- راتب موجب</span>
+salary <span class="kw2">NUMBER</span> <span class="kw">CHECK</span> (salary <span class="op">></span> <span class="num">0</span>)
+
+<span class="cmt">-- عمر بين 18 و 65</span>
+age <span class="kw2">NUMBER</span> <span class="kw">CHECK</span> (age <span class="op">>=</span> <span class="num">18</span> <span class="kw">AND</span> age <span class="op"><=</span> <span class="num">65</span>)
+
+<span class="cmt">-- constraint مسمى</span>
+<span class="kw">CONSTRAINT</span> sal_check <span class="kw">CHECK</span>(salary <span class="op">></span> <span class="num">0</span>)</div>
+      <div class="tip">يمكن استخدام AND و OR و IN في شرط الـ CHECK</div>
+    </div>
+  </div>
+
+  <div class="full-card">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-orange">🏆</div>
+      <div><div class="card-title">جدول كامل بجميع القيود</div><div class="card-sub">مثال شامل</div></div>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">CREATE TABLE</span> employee (
+  emp_id    <span class="kw2">NUMBER</span>,
+  emp_name  <span class="kw2">VARCHAR2</span>(<span class="num">50</span>)  <span class="kw">NOT NULL</span>,
+  email     <span class="kw2">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">UNIQUE</span>,
+  salary    <span class="kw2">NUMBER</span>         <span class="kw">CHECK</span>(salary <span class="op">></span> <span class="num">0</span>),
+  dept_id   <span class="kw2">NUMBER</span>,
+  <span class="kw">CONSTRAINT</span> emp_pk <span class="kw">PRIMARY KEY</span>(emp_id),
+  <span class="kw">CONSTRAINT</span> emp_dept_fk <span class="kw">FOREIGN KEY</span>(dept_id)
+    <span class="kw">REFERENCES</span> department(dept_id)
+);</div>
+    </div>
+  </div>
+</div>
+
+<!-- RELATIONAL ALGEBRA -->
+<div class="page" id="page-ra">
+  <div class="sec-title">📐 Relational Algebra</div>
+  <div class="sec-sub">العمليات الأساسية في الجبر العلائقي</div>
+
+  <div class="full-card" style="margin-bottom:1.2rem">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-purple">∑</div>
+      <div><div class="card-title">جدول العمليات الكامل</div></div>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <table class="tbl">
+        <tr><th>الرمز</th><th>الاسم</th><th>SQL المكافئ</th><th>مثال</th></tr>
+        <tr><td class="sym-cell">σ</td><td>Selection (اختيار صفوف)</td><td>WHERE</td><td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--purple)">σ salary > 600 (Employee)</td></tr>
+        <tr><td class="sym-cell">π</td><td>Projection (اختيار أعمدة)</td><td>SELECT col</td><td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--purple)">π name (Employee)</td></tr>
+        <tr><td class="sym-cell">∪</td><td>Union (اتحاد)</td><td>UNION</td><td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--purple)">R ∪ S</td></tr>
+        <tr><td class="sym-cell">−</td><td>Difference (فرق)</td><td>MINUS / EXCEPT</td><td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--purple)">R − S</td></tr>
+        <tr><td class="sym-cell">×</td><td>Cartesian Product</td><td>CROSS JOIN</td><td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--purple)">Student × Department</td></tr>
+        <tr><td class="sym-cell">⋈</td><td>Join (ربط)</td><td>JOIN ... ON</td><td style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--purple)">Student ⋈ Department</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+
+    <div class="full-card" style="margin:0">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-icon ci-purple">σ</div>
+        <div><div class="card-title">Selection — σ</div><div class="card-sub">اختيار الصفوف بشرط</div></div>
+        <div class="card-chevron">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="lbl">Relational Algebra</div>
+        <div class="code" style="font-size:14px"><span class="sym">σ</span> salary <span class="op">></span> 600 (Employee)</div>
+        <div class="lbl">SQL المكافئ</div>
+        <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> *
+<span class="kw">FROM</span> Employee
+<span class="kw">WHERE</span> salary <span class="op">></span> <span class="num">600</span>;</div>
+        <div class="tip">σ تختار الصفوف (أفقياً)</div>
+      </div>
+    </div>
+
+    <div class="full-card" style="margin:0">
+      <div class="card-header" onclick="toggleCard(this)">
+        <div class="card-icon ci-purple">π</div>
+        <div><div class="card-title">Projection — π</div><div class="card-sub">اختيار الأعمدة</div></div>
+        <div class="card-chevron">▼</div>
+      </div>
+      <div class="card-body">
+        <div class="lbl">Relational Algebra</div>
+        <div class="code" style="font-size:14px"><span class="sym">π</span> name, salary (Employee)</div>
+        <div class="lbl">SQL المكافئ</div>
+        <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> name, salary
+<span class="kw">FROM</span> Employee;</div>
+        <div class="tip">π تختار الأعمدة (عمودياً)</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="full-card" style="margin-top:1rem">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="card-icon ci-purple">⋈</div>
+      <div><div class="card-title">دمج عمليتين — Selection + Projection</div><div class="card-sub">مثال مركب</div></div>
+      <div class="card-chevron">▼</div>
+    </div>
+    <div class="card-body">
+      <div class="lbl">Relational Algebra</div>
+      <div class="code" style="font-size:14px"><span class="sym">π</span> name (<span class="sym">σ</span> salary <span class="op">></span> 600 (Employee))</div>
+      <div class="lbl">SQL المكافئ</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> name
+<span class="kw">FROM</span> Employee
+<span class="kw">WHERE</span> salary <span class="op">></span> <span class="num">600</span>;</div>
+      <div class="lbl">Join مثال</div>
+      <div class="code" style="font-size:14px"><span class="sym">π</span> student_name, dept_name (Student <span class="sym">⋈</span> Department)</div>
+      <div class="code"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="kw">SELECT</span> student_name, dept_name
+<span class="kw">FROM</span> student
+<span class="kw">JOIN</span> department
+<span class="kw">ON</span> student.dept_id = department.dept_id;</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHEATSHEET -->
+<div class="page" id="page-cheat">
+  <div class="sec-title">📋 Cheatsheet سريع</div>
+  <div class="sec-sub">مرجع سريع لجميع الأوامر والمفاهيم</div>
+
+  <div class="cheat-grid">
+    <div class="cheat-card">
+      <div class="cheat-head">🔧 ALTER TABLE</div>
+      <div class="code" style="font-size:11.5px"><span class="kw">ALTER TABLE</span> t <span class="kw">ADD</span> col type;
+<span class="kw">ALTER TABLE</span> t <span class="kw">MODIFY</span> col type;
+<span class="kw">ALTER TABLE</span> t <span class="kw">DROP COLUMN</span> col;
+<span class="kw">ALTER TABLE</span> t
+  <span class="kw">RENAME COLUMN</span> old <span class="kw">TO</span> new;</div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-head">🔑 Keys</div>
+      <div class="code" style="font-size:11.5px"><span class="cmt">-- PRIMARY KEY</span>
+<span class="kw">CONSTRAINT</span> pk <span class="kw">PRIMARY KEY</span>(id)
+
+<span class="cmt">-- FOREIGN KEY</span>
+<span class="kw">CONSTRAINT</span> fk <span class="kw">FOREIGN KEY</span>(col)
+  <span class="kw">REFERENCES</span> parent(col)</div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-head">📊 DML</div>
+      <div class="code" style="font-size:11.5px"><span class="kw">INSERT INTO</span> t <span class="kw">VALUES</span>(...);
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> t;
+<span class="kw">UPDATE</span> t <span class="kw">SET</span> col=val <span class="kw">WHERE</span> ...;
+<span class="kw">DELETE FROM</span> t <span class="kw">WHERE</span> ...;</div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-head">🔒 Constraints</div>
+      <div class="code" style="font-size:11.5px">col type <span class="kw">NOT NULL</span>
+col type <span class="kw">UNIQUE</span>
+col type <span class="kw">CHECK</span>(col > <span class="num">0</span>)
+<span class="kw">PRIMARY KEY</span>(col)
+<span class="kw">FOREIGN KEY</span>(col)
+  <span class="kw">REFERENCES</span> t2(col)</div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-head">📐 Relational Algebra</div>
+      <div class="code" style="font-size:12px"><span class="sym">σ</span> condition (R)    <span class="cmt">= WHERE</span>
+<span class="sym">π</span> cols (R)         <span class="cmt">= SELECT cols</span>
+R <span class="sym">∪</span> S             <span class="cmt">= UNION</span>
+R <span class="sym">−</span> S             <span class="cmt">= MINUS</span>
+R <span class="sym">×</span> S             <span class="cmt">= CROSS JOIN</span>
+R <span class="sym">⋈</span> S             <span class="cmt">= JOIN</span></div>
+    </div>
+    <div class="cheat-card">
+      <div class="cheat-head">⚡ قواعد ذهبية</div>
+      <div style="font-size:12.5px;line-height:1.9;color:var(--text2)">
+        • PK = NOT NULL + UNIQUE<br>
+        • أنشئ الأب قبل الابن<br>
+        • UPDATE/DELETE بدون WHERE = خطر<br>
+        • TRUNCATE لا رجعة منه<br>
+        • σ = صفوف | π = أعمدة
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.5rem">
+    <div class="sec-title" style="font-size:1.1rem;margin-bottom:1rem">🔍 مثال متكامل — من البداية للنهاية</div>
+    <div class="code" style="font-size:12.5px"><button class="copy-btn" onclick="copyCode(this)">نسخ</button><span class="cmt">-- 1. إنشاء جدول الأب</span>
+<span class="kw">CREATE TABLE</span> department (
+  dept_id   <span class="kw2">NUMBER</span>,
+  dept_name <span class="kw2">VARCHAR2</span>(<span class="num">30</span>) <span class="kw">NOT NULL</span>,
+  <span class="kw">CONSTRAINT</span> dept_pk <span class="kw">PRIMARY KEY</span>(dept_id)
+);
+
+<span class="cmt">-- 2. إنشاء جدول الابن</span>
+<span class="kw">CREATE TABLE</span> student (
+  student_id   <span class="kw2">NUMBER</span>,
+  student_name <span class="kw2">VARCHAR2</span>(<span class="num">50</span>) <span class="kw">NOT NULL</span>,
+  email        <span class="kw2">VARCHAR2</span>(<span class="num">100</span>) <span class="kw">UNIQUE</span>,
+  dept_id      <span class="kw2">NUMBER</span>,
+  <span class="kw">CONSTRAINT</span> student_pk <span class="kw">PRIMARY KEY</span>(student_id),
+  <span class="kw">CONSTRAINT</span> dept_fk <span class="kw">FOREIGN KEY</span>(dept_id)
+    <span class="kw">REFERENCES</span> department(dept_id)
+);
+
+<span class="cmt">-- 3. إدخال بيانات</span>
+<span class="kw">INSERT INTO</span> department <span class="kw">VALUES</span>(<span class="num">1</span>, <span class="str">'IT'</span>);
+<span class="kw">INSERT INTO</span> student <span class="kw">VALUES</span>(<span class="num">101</span>, <span class="str">'Ahmad'</span>, <span class="str">'a@uni.edu'</span>, <span class="num">1</span>);
+
+<span class="cmt">-- 4. استعلام مع JOIN</span>
+<span class="kw">SELECT</span> student_name, dept_name
+<span class="kw">FROM</span> student
+<span class="kw">JOIN</span> department <span class="kw">ON</span> student.dept_id = department.dept_id;
+
+<span class="cmt">-- 5. تعديل</span>
+<span class="kw">UPDATE</span> student <span class="kw">SET</span> student_name = <span class="str">'Ahmad Ali'</span> <span class="kw">WHERE</span> student_id = <span class="num">101</span>;
+
+<span class="cmt">-- 6. حذف</span>
+<span class="kw">DELETE FROM</span> student <span class="kw">WHERE</span> student_id = <span class="num">101</span>;</div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="page" id="page-quiz">
+  <div class="sec-title">🎯 اختبار تفاعلي</div>
+  <div class="sec-sub">اختبر نفسك قبل الامتحان</div>
+
+  <div class="quiz-header">
+    <div>
+      <div class="score-big" id="score-disp">0 / 10</div>
+      <div class="score-lbl">نقاطك الحالية</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog" style="width:0%"></div></div>
+    <button class="reset-btn" onclick="resetQuiz()">↺ إعادة الاختبار</button>
+  </div>
+
+  <div id="q-container"></div>
+
+  <div class="fill-section">
+    <div class="fill-sec-title">⌨️ أكمل الكود الناقص</div>
+    <div id="fill-container"></div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+  database lab notes // lab 3 &amp; lab 4 // oracle sql
+</footer>
+
+<script>
+// NAV
+const pages = ['home','lab3','lab4','constraints','ra','cheat','quiz'];
+function showPage(id) {
+  pages.forEach(p => {
+    document.getElementById('page-'+p).classList.toggle('active', p===id);
+  });
+  document.querySelectorAll('.nav-btn').forEach((b,i) => {
+    b.classList.toggle('active', pages[i]===id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// TOGGLE CARD
+function toggleCard(header) {
+  const card = header.closest('.full-card, .card');
+  card.classList.toggle('open');
+}
+
+// COPY CODE
+function copyCode(btn) {
+  const block = btn.parentElement;
+  const text = block.innerText.replace('نسخ','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ تم';
+    setTimeout(() => btn.textContent = 'نسخ', 1500);
+  });
+}
+
+// QUIZ DATA
+const questions = [
+  { q: 'ما الأمر الصحيح لإضافة عمود جديد لجدول موجود؟', opts: ['ALTER TABLE student ADD email VARCHAR2(100);','UPDATE TABLE student ADD email VARCHAR2(100);','INSERT TABLE student ADD email;','MODIFY TABLE student ADD COLUMN email;'], ans: 0, exp: '✓ ALTER TABLE + ADD هو الأمر الصحيح لإضافة عمود' },
+  { q: 'ما الفرق الأساسي بين DELETE و TRUNCATE؟', opts: ['لا فرق بينهما','DELETE يدعم WHERE ويمكن Rollback، أما TRUNCATE فأسرع ولا يمكن Rollback','TRUNCATE أبطأ من DELETE','DELETE يحذف الجدول بالكامل'], ans: 1, exp: '✓ DELETE يسمح بشرط WHERE وقابل للتراجع، TRUNCATE نهائي وأسرع' },
+  { q: 'ما الرمز المستخدم في Relational Algebra للـ Selection؟', opts: ['π (pi)','σ (sigma)','∪ (union)','⋈ (join)'], ans: 1, exp: '✓ σ (sigma) تُستخدم للـ Selection وتكافئ WHERE في SQL' },
+  { q: 'أي constraint يجمع خصائص NOT NULL وUNIQUE معاً؟', opts: ['CHECK','FOREIGN KEY','PRIMARY KEY','UNIQUE'], ans: 2, exp: '✓ PRIMARY KEY = NOT NULL + UNIQUE تلقائياً' },
+  { q: 'ما الصيغة الصحيحة لحذف عمود من جدول؟', opts: ['ALTER TABLE student REMOVE email;','DROP COLUMN email FROM student;','ALTER TABLE student DELETE COLUMN email;','ALTER TABLE student DROP COLUMN email;'], ans: 3, exp: '✓ ALTER TABLE + DROP COLUMN هي الصيغة الصحيحة في Oracle' },
+  { q: 'عند إنشاء FOREIGN KEY، ما الذي يجب إنشاؤه أولاً؟', opts: ['جدول الابن','جدول الأب (المرجعي)','كلاهما في نفس الوقت','لا يهم الترتيب'], ans: 1, exp: '✓ يجب إنشاء الجدول الأب أولاً لأن الابن يرجع إليه' },
+  { q: 'ما تأثير UPDATE بدون WHERE؟', opts: ['لن ينفذ الأمر','سيعطي خطأ','سيعدل صف واحد فقط','سيعدل جميع الصفوف في الجدول'], ans: 3, exp: '⚠️ بدون WHERE يطبق التعديل على كل الصفوف — خطر كبير!' },
+  { q: 'ما مكافئ العملية π name (Employee) في SQL؟', opts: ['SELECT * FROM Employee','SELECT name FROM Employee','SELECT Employee FROM name','WHERE name = Employee'], ans: 1, exp: '✓ Projection (π) تختار أعمدة محددة = SELECT col' },
+  { q: 'أي constraint يمنع إدخال قيمة سالبة في عمود salary؟', opts: ['NOT NULL','UNIQUE','CHECK (salary > 0)','PRIMARY KEY'], ans: 2, exp: '✓ CHECK يسمح بتعريف شرط مخصص على القيم المسموح بها' },
+  { q: 'ماذا يفعل RENAME COLUMN في Oracle؟', opts: ['يحذف العمود القديم ويضيف جديد','يغير اسم العمود فقط دون المساس بالبيانات','ينسخ البيانات لعمود آخر','يدمج عمودين معاً'], ans: 1, exp: '✓ RENAME COLUMN يغير الاسم فقط — البيانات والـ datatype تبقى كما هي' }
+];
+
+const fillQs = [
+  { q: 'أكمل: تعديل حجم عمود student_name ليصبح 100 حرف', code: 'ALTER TABLE student _____ student_name VARCHAR2(100);', ans: 'MODIFY' },
+  { q: 'أكمل: إدخال بيانات في جدول department', code: '_____ INTO department VALUES(2, \'CS\');', ans: 'INSERT' },
+  { q: 'أكمل: عرض كل بيانات جدول student', code: 'SELECT * _____ student;', ans: 'FROM' },
+  { q: 'أكمل: ربط FOREIGN KEY بالجدول الأب', code: 'CONSTRAINT dept_fk FOREIGN KEY(dept_id) _____ department(dept_id);', ans: 'REFERENCES' },
+  { q: 'أكمل: حذف الطالب رقم 105', code: 'DELETE _____ student WHERE student_id = 105;', ans: 'FROM' },
+  { q: 'أكمل: تغيير اسم عمود name إلى full_name', code: 'ALTER TABLE employee _____ COLUMN name TO full_name;', ans: 'RENAME' }
+];
+
+let score = 0, answered = new Array(questions.length).fill(false);
+
+function buildQuiz() {
+  const qc = document.getElementById('q-container');
+  qc.innerHTML = '';
+  questions.forEach((q, qi) => {
+    const div = document.createElement('div');
+    div.className = 'q-card';
+    div.id = 'qc-' + qi;
+    div.innerHTML = `
+      <div class="q-num">QUESTION ${qi+1} / ${questions.length}</div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-opts">
+        ${q.opts.map((o,oi) => `<button class="q-opt" id="opt-${qi}-${oi}" onclick="answer(${qi},${oi})">${o}</button>`).join('')}
+      </div>
+      <div class="q-explain" id="exp-${qi}"></div>
+    `;
+    qc.appendChild(div);
+  });
+
+  const fc = document.getElementById('fill-container');
+  fc.innerHTML = '';
+  fillQs.forEach((fq, fi) => {
+    fc.innerHTML += `
+      <div class="fill-card">
+        <div class="fill-q">${fi+1}. ${fq.q}</div>
+        <div class="code" style="font-size:13px;margin:8px 0">${fq.code}</div>
+        <div class="fill-row">
+          <input class="fill-in" id="fin-${fi}" placeholder="اكتب الكلمة الناقصة..." />
+          <button class="check-btn" onclick="checkFill(${fi})">تحقق ✓</button>
+        </div>
+        <div class="fill-res" id="fres-${fi}"></div>
+      </div>
+    `;
+  });
+}
+
+function answer(qi, chosen) {
+  if (answered[qi]) return;
+  answered[qi] = true;
+  const q = questions[qi];
+  const exp = document.getElementById('exp-' + qi);
+  for (let i = 0; i < q.opts.length; i++) {
+    const el = document.getElementById(`opt-${qi}-${i}`);
+    el.classList.add('locked');
+    if (i === q.ans) el.classList.add('correct');
+    else if (i === chosen && chosen !== q.ans) el.classList.add('wrong');
+  }
+  const correct = chosen === q.ans;
+  if (correct) score++;
+  exp.className = 'q-explain show ' + (correct ? 'ok' : 'fail');
+  exp.innerHTML = (correct ? '✓ صحيح! ' : '✗ خطأ. ') + q.exp;
+  document.getElementById('score-disp').textContent = score + ' / ' + questions.length;
+  const pct = (answered.filter(Boolean).length / questions.length) * 100;
+  document.getElementById('prog').style.width = pct + '%';
+}
+
+function checkFill(fi) {
+  const input = document.getElementById('fin-' + fi);
+  const res = document.getElementById('fres-' + fi);
+  const val = input.value.trim().toUpperCase();
+  const correct = fillQs[fi].ans.toUpperCase();
+  res.classList.add('show');
+  if (val === correct) {
+    res.className = 'fill-res show ok';
+    res.innerHTML = '✓ ممتاز! الإجابة صحيحة';
+    input.className = 'fill-in ok';
+  } else {
+    res.className = 'fill-res show fail';
+    res.innerHTML = `✗ خطأ — الإجابة الصحيحة: <strong style="font-family:'IBM Plex Mono',monospace">${fillQs[fi].ans}</strong>`;
+    input.className = 'fill-in fail';
+  }
+}
+
+function resetQuiz() {
+  score = 0;
+  answered = new Array(questions.length).fill(false);
+  document.getElementById('score-disp').textContent = '0 / ' + questions.length;
+  document.getElementById('prog').style.width = '0%';
+  buildQuiz();
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
